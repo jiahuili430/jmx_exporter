@@ -262,6 +262,7 @@ public class HTTPServerFactory {
         HTTPServer.Builder httpServerBuilder =
                 HTTPServer.builder().inetAddress(inetAddress).port(port).registry(prometheusRegistry);
 
+        configurePath(rootMapAccessor, httpServerBuilder);
         configureThreads(rootMapAccessor, httpServerBuilder);
         configureAuthentication(rootMapAccessor, httpServerBuilder);
         configureSSL(rootMapAccessor, httpServerBuilder);
@@ -288,11 +289,37 @@ public class HTTPServerFactory {
 
         HTTPServer.Builder httpServerBuilder = HTTPServer.builder().registry(prometheusRegistry);
 
+        configurePath(rootMapAccessor, httpServerBuilder);
         configureThreads(rootMapAccessor, httpServerBuilder);
         configureAuthentication(rootMapAccessor, httpServerBuilder);
         configureSSL(rootMapAccessor, httpServerBuilder);
 
         return httpServerBuilder.buildAndStart();
+    }
+
+    /**
+     * Configures the HTTP server metrics endpoint path based on YAML configuration.
+     *
+     * <p>The metrics path is read from the {@code /httpServer/path} configuration. If not
+     * specified, the default path {@code /metrics} is used.
+     *
+     * @param rootMapAccessor the root configuration map accessor, must not be {@code null}
+     * @param httpServerBuilder the HTTP server builder to configure, must not be {@code null}
+     * @throws ConfigurationException if the path configuration is invalid
+     */
+    private static void configurePath(MapAccessor rootMapAccessor, HTTPServer.Builder httpServerBuilder) {
+        String metricsPath = rootMapAccessor
+                .get("/httpServer/path")
+                .map(new ToString(ConfigurationException.supplier("/httpServer/path must be a string")))
+                .map(new StringIsNotBlank(ConfigurationException.supplier("/httpServer/path must not be blank")))
+                .orElse("/metrics");
+
+        // Ensure path starts with /
+        if (!metricsPath.startsWith("/")) {
+            metricsPath = "/" + metricsPath;
+        }
+
+        httpServerBuilder.metricsHandlerPath(metricsPath);
     }
 
     /**

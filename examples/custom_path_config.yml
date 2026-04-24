@@ -1,0 +1,25 @@
+---
+# Example configuration showing custom metrics path
+
+# Custom metrics endpoint path (optional, defaults to /metrics)
+# The path will be automatically prefixed with / if not provided
+httpServer:
+  path: /custom/metrics
+
+# Optional: HTTP server thread pool configuration
+# httpServer:
+#   threads:
+#     minimum: 1
+#     maximum: 10
+#     keepAliveTime: 120
+
+# JMX connection settings (for standalone mode)
+hostPort: localhost:5555
+username:
+password:
+
+# Metric collection rules
+rules:
+  - pattern: ".*"
+
+# Made with Bob

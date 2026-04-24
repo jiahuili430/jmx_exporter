@@ -1,8 +1,13 @@
 ---
+# JMX connection settings
 hostPort: localhost:5555
-username: 
-password: 
+username:
+password:
 
+# Optional: Custom metrics endpoint path (defaults to /metrics if not specified)
+# httpServer:
+#   path: /metrics
+
+# Metric collection rules
 rules:
-- pattern: ".*"
-
+  - pattern: ".*"
